@@ -5,23 +5,23 @@
 
 # Summary
 
-Most modern languages implement an exception system, which is a practical mechanism to the developper, but at the same time very likely to compromise safety, and is not acceptable in Rust's standards.
+Most modern languages implement an exception system, which is a practical mechanism to the developer, but at the same time very likely to compromise safety, and is not acceptable in Rust's standards.
 
 The main concept here would be to reproduce try/catch blocks constructs without any exception approach, based on the current `std::Result<T, E>` paradigm. It would provide lots of benefits in practice, and could be done with some compiler magic.
 
 
 # Motivation
 
-While Rust's was designed with a non-negociable safety requirements,  the absence of an exception system has resulted with a massive use of `std::Result<T, E>`, returned by any function introducing a possibility to fail.
+While Rust's was designed with a non-negotiable safety requirements,  the absence of an exception system has resulted with a massive use of `std::Result<T, E>`, returned by any function introducing a possibility to fail.
 
 The introduction of the try! macro did provide in some case improvements, but its requirements don't make it usable in most contexts. (in the context of different Error types)
 
-This leads in practice to an massive amount of code, requiring to implement a behavior for each possible for each function call returning a Result, and greatly increases verbosity of the code produced.
+This leads in practice to a massive amount of code, requires a behavior be implemented for each possible function call returning a Result, and greatly increases verbosity of the code produced.
 
 
 # Detailed design
 
-A try/catch block in Rust would basically adopt the traditionnal syntax, with a try, catch and throw keywords.
+A try/catch block in Rust would basically adopt the traditional syntax, with a try, catch and throw keywords.
 
 Here is a simple use case:
 
@@ -47,11 +47,11 @@ fn someFunction() -> Result<R, ErrorA>
 ```
 In this example, we consider `some_operation` to have the signature `some_operation() -> Result<R, ErrorB>`.
 
-Hence, the try blocks acquire a special caracteristic, by eliding any `Result<R, E>` and returning the `R` instance directly, it's responsible to check weither the operation failed or not via the standard `Result<T,E>` construct.
+Hence, the try block acquires a special characteristic; by eliding any `Result<R, E>` and returning the `R` instance directly, it's responsible for determining if the operation failed or not via the standard `Result<T,E>` construct.
 
-In case the operation did failled, the try block would drop the current `try` scope safely (same behavior as `return` statement) and initiates a call to `catch(err : &ErrorB)`.
+Upon operation failure, the try block will drop the current `try` scope safely (same behavior as `return` statement) and initiate a call to `catch(err : &ErrorB)`.
 
-The `catch` block would be internally a closure with a `&ErrorB` as input and returns a `Result<R, ErrorA>` just like `someFunction`.
+The `catch` block would internally be a closure with an `&ErrorB` as input, returning a `Result<R, ErrorA>` just like `someFunction`.
 Inside the catch block, the implementor can either resolve the error by returning a `R` instance, or return a `ErrorA` using the `throw` keyword.
 
 Hence the compiler should translate the code above to something like:
@@ -96,7 +96,7 @@ The example above shows the compiler has to be able **to split the try block int
 
 - If the result is Ok for the current node, the next "statement node"  is executed.
 
-- If an error occured the catch block handling the corresponding error type is called.
+- If an error occurred the catch block handling the corresponding error type is called.
 
 The compiler will refuse to compile if a required Catch block implementing a specific error type is missing. 
 Hence a try block with multiple calls that involve ErrorB, ErrorC, and ErrorD would require:
@@ -119,8 +119,8 @@ try
 #Benefits
 
 - With such a feature, Rust code would greatly gain in readability and conciseness.
-- In the try block, Eliding any Result<T,E> into T would allow to chain calls recursively, without dealing with potential error in the try body.
-- Most of the time the same behavior is used multiple times for multiple potencial errors.
+- In the try block, Eliding any Result<T,E> into T would allow calls to be chained recursively, without dealing with potential error in the try body.
+- Most of the time the same behavior is used multiple times for multiple potential errors.
 
 # Drawbacks
 
