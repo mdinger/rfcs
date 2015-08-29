@@ -1,4 +1,4 @@
-- Feature Name: try_catch_blocks_in_rust
+- Feature Name: try_catch_blocks
 - Start Date: 2015-08-29
 - RFC PR: (leave this empty)
 - Rust Issue: (leave this empty)
@@ -7,7 +7,7 @@
 
 Most modern languages implement an exception system, which is a practical mechanism to the developper, but at the same time very likely to compromise safety, and is not acceptable in Rust's standards.
 
-However reproducing try/catch blocks constructs could be feasible, based on the current `std::Result<T, E>` paradigm. It would provide lots of benefits in practice, and could be done with some compiler magic.
+The main concept here would be to reproduce try/catch blocks constructs without any exception approach, based on the current `std::Result<T, E>` paradigm. It would provide lots of benefits in practice, and could be done with some compiler magic.
 
 
 # Motivation
@@ -94,9 +94,9 @@ fn someFunction() -> Result<R, ErrorA>
 
 The example above shows the compiler has to be able **to split the try block into a chain of statements, where each "split" occurs when a call to a function returning a Result<,> is made.**
 
--If the result is Ok for the current node, the next "statement node"  is executed.
+- If the result is Ok for the current node, the next "statement node"  is executed.
 
--If an error occured the catch block handling the corresponding error type is called.
+- If an error occured the catch block handling the corresponding error type is called.
 
 The compiler will refuse to compile if a required Catch block implementing a specific error type is missing. 
 Hence a try block with multiple calls that involve ErrorB, ErrorC, and ErrorD would require:
@@ -118,8 +118,9 @@ try
 
 #Benefits
 
--With such a feature, Rust code would greatly gain in readability and conciseness.
--In the try block, Eliding any Result<T,E> into T would allow to chain calls recursively, without dealing with potential error.  
+- With such a feature, Rust code would greatly gain in readability and conciseness.
+- In the try block, Eliding any Result<T,E> into T would allow to chain calls recursively, without dealing with potential error in the try body.
+- Most of the time the same behavior is used multiple times for multiple potencial errors.
 
 # Drawbacks
 
@@ -127,8 +128,8 @@ Such feature wouldn't have any impact on existing code in my knowledge.
 
 # Alternatives
 
-I've considered a single catch block, that would require a new trait, to be implemented by all errors, however this would involve a breaking change.
+I've considered a single catch block, that would require a new trait, to be implemented by all errors, however this would involve a major breaking change.
 
 # Unresolved questions
 
-Implementing a stacktrace would be useful. 
+Implementing a stacktrace would be useful. (if there isn't any yet)
