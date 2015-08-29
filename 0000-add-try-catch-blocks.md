@@ -25,7 +25,7 @@ A try/catch block in Rust would basically adopt the traditionnal syntax, with a 
 
 Here is a simple use case:
 
-```
+```rust
 
 fn someFunction() -> Result<R, ErrorA>
 {
@@ -56,7 +56,7 @@ Inside the catch block, the implementor can either resolve the error by returnin
 
 Hence the compiler should translate the code above to something like:
 
-```
+```rust
 
 fn someFunction() -> Result<R, ErrorA>
 {
